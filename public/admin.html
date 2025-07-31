@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBot Multiplataforma - Panel de Administración</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo i {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .logo h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .platform-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .platform-tab {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .platform-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .platform-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .platform-tab i {
+            font-size: 16px;
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+        }
+
+        .stats h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-indicator.offline {
+            background: #ef4444;
+        }
+
+        /* Chat Area */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .conversations-list {
+            width: 300px;
+            border-right: 1px solid #e5e7eb;
+            background: #f9fafb;
+            overflow-y: auto;
+        }
+
+        .conversations-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .conversations-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .conversation-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            background: white;
+        }
+
+        .conversation-item:hover {
+            background: #f3f4f6;
+        }
+
+        .conversation-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .conversation-user {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .conversation-time {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .conversation-preview {
+            font-size: 13px;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .platform-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .platform-badge.whatsapp {
+            background: #25d366;
+            color: white;
+        }
+
+        .platform-badge.instagram {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            color: white;
+        }
+
+        .platform-badge.facebook {
+            background: #1877f2;
+            color: white;
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .chat-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .message.incoming {
+            justify-content: flex-start;
+        }
+
+        .message.outgoing {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.incoming .message-content {
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+        }
+
+        .message.outgoing .message-content {
+            background: #667eea;
+            color: white;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+
+        .message-input {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-textarea {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            resize: none;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.4;
+            max-height: 100px;
+            min-height: 44px;
+        }
+
+        .message-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-button {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .send-button:hover {
+            background: #5a67d8;
+        }
+
+        .send-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .conversations-list {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <h1>ChatBot Pro</h1>
+            </div>
+
+            <div class="platform-tabs">
+                <button class="platform-tab active" data-platform="all">
+                    <i class="fas fa-globe"></i>
+                    Todas las plataformas
+                </button>
+                <button class="platform-tab" data-platform="whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    WhatsApp
+                </button>
+                <button class="platform-tab" data-platform="instagram">
+                    <i class="fab fa-instagram"></i>
+                    Instagram
+                </button>
+                <button class="platform-tab" data-platform="facebook">
+                    <i class="fab fa-facebook-messenger"></i>
+                    Facebook
+                </button>
+            </div>
+
+            <div class="stats">
+                <h3>Estadísticas</h3>
+                <div class="stat-item">
+                    <span>Conversaciones</span>
+                    <span class="stat-value" id="total-conversations">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Mensajes</span>
+                    <span class="stat-value" id="total-messages">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Activos hoy</span>
+                    <span class="stat-value" id="active-today">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2 id="current-platform">Todas las plataformas</h2>
+                <div class="status-indicator" id="status-indicator">
+                    <i class="fas fa-circle"></i>
+                    <span>Conectado</span>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <!-- Conversations List -->
+                <div class="conversations-list">
+                    <div class="conversations-header">
+                        <h3>Conversaciones</h3>
+                    </div>
+                    <div id="conversations-list">
+                        <!-- Conversations will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="chat-messages">
+                    <div class="chat-header" id="chat-header" style="display: none;">
+                        <h3 id="current-user">Selecciona una conversación</h3>
+                    </div>
+                    
+                    <div class="messages-container" id="messages-container">
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <h3>No hay conversación seleccionada</h3>
+                            <p>Selecciona una conversación de la lista para comenzar a chatear</p>
+                        </div>
+                    </div>
+
+                    <div class="message-input" id="message-input" style="display: none;">
+                        <div class="input-container">
+                            <textarea 
+                                class="message-textarea" 
+                                id="message-textarea" 
+                                placeholder="Escribe tu mensaje..."
+                                rows="1"
+                            ></textarea>
+                            <button class="send-button" id="send-button">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Variables globales
+        let socket;
+        let currentConversation = null;
+        let currentPlatform = 'all';
+        let conversations = [];
+
+        // Inicializar Socket.IO
+        function initSocket() {
+            socket = io();
+            
+            socket.on('connect', () => {
+                updateStatus(true);
+            });
+            
+            socket.on('disconnect', () => {
+                updateStatus(false);
+            });
+            
+            socket.on('new-message', (data) => {
+                handleNewMessage(data);
+            });
+        }
+
+        // Actualizar estado de conexión
+        function updateStatus(connected) {
+            const indicator = document.getElementById('status-indicator');
+            if (connected) {
+                indicator.className = 'status-indicator';
+                indicator.innerHTML = '<i class="fas fa-circle"></i><span>Conectado</span>';
+            } else {
+                indicator.className = 'status-indicator offline';
+                indicator.innerHTML = '<i class="fas fa-circle"></i><span>Desconectado</span>';
+            }
+        }
+
+        // Cargar conversaciones
+        async function loadConversations() {
+            try {
+                const response = await fetch('/api/conversations');
+                const data = await response.json();
+                
+                if (data.success) {
+                    conversations = data.data;
+                    renderConversations();
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error cargando conversaciones:', error);
+            }
+        }
+
+        // Renderizar conversaciones
+        function renderConversations() {
+            const container = document.getElementById('conversations-list');
+            const filteredConversations = conversations.filter(conv => 
+                currentPlatform === 'all' || conv.platform === currentPlatform
+            );
+
+            if (filteredConversations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No hay conversaciones</h3>
+                        <p>Las conversaciones aparecerán aquí cuando lleguen mensajes</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredConversations
+                .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                .map(conv => `
+                    <div class="conversation-item" data-conversation-id="${conv.id}">
+                        <div class="conversation-header">
+                            <span class="conversation-user">
+                                ${conv.userId}
+                                <span class="platform-badge ${conv.platform}">${conv.platform}</span>
+                            </span>
+                            <span class="conversation-time">${formatTime(conv.updatedAt)}</span>
+                        </div>
+                        <div class="conversation-preview">
+                            ${conv.lastMessage ? conv.lastMessage.content : 'Sin mensajes'}
+                        </div>
+                    </div>
+                `).join('');
+
+            // Agregar event listeners
+            container.querySelectorAll('.conversation-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    selectConversation(item.dataset.conversationId);
+                });
+            });
+        }
+
+        // Seleccionar conversación
+        async function selectConversation(conversationId) {
+            try {
+                const conversation = conversations.find(c => c.id === conversationId);
+                if (!conversation) return;
+
+                currentConversation = conversation;
+                
+                // Actualizar UI
+                document.querySelectorAll('.conversation-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-conversation-id="${conversationId}"]`).classList.add('active');
+
+                // Mostrar chat
+                document.getElementById('chat-header').style.display = 'block';
+                document.getElementById('message-input').style.display = 'block';
+                document.getElementById('current-user').textContent = `${conversation.userId} (${conversation.platform})`;
+
+                // Cargar mensajes
+                await loadMessages(conversation.platform, conversation.userId);
+                
+                // Unirse a la sala de Socket.IO
+                socket.emit('join-conversation', {
+                    platform: conversation.platform,
+                    userId: conversation.userId
+                });
+
+            } catch (error) {
+                console.error('Error seleccionando conversación:', error);
+            }
+        }
+
+        // Cargar mensajes
+        async function loadMessages(platform, userId) {
+            try {
+                const response = await fetch(`/api/conversations/${platform}/${userId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderMessages(data.data.messages);
+                }
+            } catch (error) {
+                console.error('Error cargando mensajes:', error);
+            }
+        }
+
+        // Renderizar mensajes
+        function renderMessages(messages) {
+            const container = document.getElementById('messages-container');
+            
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <h3>No hay mensajes</h3>
+                        <p>Comienza la conversación enviando un mensaje</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = messages.map(msg => `
+                <div class="message ${msg.direction}">
+                    <div class="message-content">
+                        ${msg.content}
+                        <div class="message-time">${formatTime(msg.timestamp)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Scroll al final
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Manejar nuevo mensaje
+        function handleNewMessage(data) {
+            if (currentConversation && 
+                currentConversation.platform === data.platform && 
+                currentConversation.userId === data.userId) {
+                
+                // Actualizar conversación local
+                const conversation = conversations.find(c => c.id === `${data.platform}-${data.userId}`);
+                if (conversation) {
+                    conversation.lastMessage = data;
+                    conversation.updatedAt = data.timestamp;
+                }
+
+                // Agregar mensaje al chat actual
+                const container = document.getElementById('messages-container');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${data.type}`;
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        ${data.message}
+                        <div class="message-time">${formatTime(data.timestamp)}</div>
+                    </div>
+                `;
+                container.appendChild(messageDiv);
+                container.scrollTop = container.scrollHeight;
+
+                // Actualizar lista de conversaciones
+                renderConversations();
+            }
+        }
+
+        // Enviar mensaje
+        async function sendMessage() {
+            if (!currentConversation) return;
+
+            const textarea = document.getElementById('message-textarea');
+            const message = textarea.value.trim();
+            
+            if (!message) return;
+
+            try {
+                const response = await fetch('/api/send-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        platform: currentConversation.platform,
+                        userId: currentConversation.userId,
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    textarea.value = '';
+                    
+                    // Agregar mensaje al chat
+                    const container = document.getElementById('messages-container');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message outgoing';
+                    messageDiv.innerHTML = `
+                        <div class="message-content">
+                            ${message}
+                            <div class="message-time">${formatTime(new Date())}</div>
+                        </div>
+                    `;
+                    container.appendChild(messageDiv);
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error enviando mensaje:', error);
+            }
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            document.getElementById('total-conversations').textContent = conversations.length;
+            document.getElementById('total-messages').textContent = 
+                conversations.reduce((total, conv) => total + conv.messages.length, 0);
+            
+            const today = new Date().toDateString();
+            const activeToday = conversations.filter(conv => 
+                new Date(conv.updatedAt).toDateString() === today
+            ).length;
+            document.getElementById('active-today').textContent = activeToday;
+        }
+
+        // Formatear tiempo
+        function formatTime(date) {
+            const d = new Date(date);
+            const now = new Date();
+            const diff = now - d;
+            
+            if (diff < 60000) return 'Ahora';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h`;
+            return d.toLocaleDateString();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initSocket();
+            loadConversations();
+
+            // Platform tabs
+            document.querySelectorAll('.platform-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    currentPlatform = tab.dataset.platform;
+                    document.getElementById('current-platform').textContent = tab.textContent.trim();
+                    
+                    renderConversations();
+                });
+            });
+
+            // Send message
+            document.getElementById('send-button').addEventListener('click', sendMessage);
+            
+            // Enter key
+            document.getElementById('message-textarea').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Auto-resize textarea
+            document.getElementById('message-textarea').addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+
+            // Cargar conversaciones cada 30 segundos
+            setInterval(loadConversations, 30000);
+        });
+    </script>
+</body>
+</html> 
