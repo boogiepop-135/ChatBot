@@ -11,8 +11,8 @@ class ChatbotController {
   // Obtener todas las conversaciones
   getConversations(req, res) {
     try {
-      // Verificar que conversations existe
-      if (!this.conversations) {
+      // Verificar que conversations existe y es una instancia válida
+      if (!this.conversations || !(this.conversations instanceof Map)) {
         this.conversations = new Map();
       }
       
