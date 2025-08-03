@@ -8,6 +8,8 @@
     "dev": "nodemon server.js",
     "demo": "node demo-server.js",
     "demo:dev": "nodemon demo-server.js",
+    "configurar-whatsapp": "node configurar-whatsapp.js",
+    "verificar-config": "node verificar-configuracion.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["chatbot", "whatsapp", "instagram", "facebook", "messenger"],
