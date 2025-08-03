@@ -2,21 +2,20 @@ const whatsappController = require('./whatsappController');
 const instagramController = require('./instagramController');
 const facebookController = require('./facebookController');
 
+// Almacenamiento global de conversaciones
+let globalConversations = new Map();
+
 class ChatbotController {
   constructor() {
-    // Almacenamiento temporal de conversaciones (en producción usar base de datos)
-    this.conversations = new Map();
+    // Usar almacenamiento global para evitar pérdida de referencia
+    this.conversations = globalConversations;
   }
 
   // Obtener todas las conversaciones
   getConversations(req, res) {
     try {
-      // Verificar que conversations existe y es una instancia válida
-      if (!this.conversations || !(this.conversations instanceof Map)) {
-        this.conversations = new Map();
-      }
-      
-      const conversations = Array.from(this.conversations.values());
+      // Usar almacenamiento global directamente
+      const conversations = Array.from(globalConversations.values());
       res.json({
         success: true,
         data: conversations
@@ -35,7 +34,7 @@ class ChatbotController {
     try {
       const { platform, userId } = req.params;
       const conversationKey = `${platform}-${userId}`;
-      const conversation = this.conversations.get(conversationKey);
+      const conversation = globalConversations.get(conversationKey);
 
       if (!conversation) {
         return res.status(404).json({
@@ -127,8 +126,8 @@ class ChatbotController {
       timestamp: new Date()
     };
 
-    if (!this.conversations.has(conversationKey)) {
-      this.conversations.set(conversationKey, {
+    if (!globalConversations.has(conversationKey)) {
+      globalConversations.set(conversationKey, {
         id: conversationKey,
         platform,
         userId,
@@ -139,7 +138,7 @@ class ChatbotController {
       });
     }
 
-    const conversation = this.conversations.get(conversationKey);
+    const conversation = globalConversations.get(conversationKey);
     conversation.messages.push(message);
     conversation.lastMessage = message;
     conversation.updatedAt = new Date();
@@ -155,7 +154,7 @@ class ChatbotController {
   // Obtener estadísticas del chatbot
   getStats(req, res) {
     try {
-      const conversations = Array.from(this.conversations.values());
+      const conversations = Array.from(globalConversations.values());
       const stats = {
         totalConversations: conversations.length,
         conversationsByPlatform: {
