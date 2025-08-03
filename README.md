@@ -13,18 +13,50 @@ Un chatbot inteligente que funciona con **WhatsApp**, **Instagram** y **Facebook
 
 ## 🚀 Instalación
 
-### 1. Clonar el repositorio
+### 🐳 Opción 1: Con Docker (Recomendado)
+
+#### Prerrequisitos
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y ejecutándose
+
+#### Inicio Rápido
+```bash
+# 1. Clonar el repositorio
+git clone <tu-repositorio>
+cd ChatBot
+
+# 2. Ejecutar en modo DEMO (recomendado para pruebas)
+# Windows
+scripts\docker-build.bat demo
+
+# Linux/Mac
+chmod +x scripts/docker-build.sh
+./scripts/docker-build.sh demo
+
+# 3. Acceder al panel
+# Abre: http://localhost:3000/admin
+```
+
+#### Modos Disponibles
+- **Demo**: `./scripts/docker-build.sh demo` - Conversaciones simuladas
+- **Producción**: `./scripts/docker-build.sh prod` - APIs reales (requiere .env)
+- **Desarrollo**: `./scripts/docker-build.sh dev` - Hot-reload
+
+📖 **Ver documentación completa de Docker**: [DOCKER.md](DOCKER.md)
+
+### 💻 Opción 2: Instalación Local
+
+#### 1. Clonar el repositorio
 ```bash
 git clone <tu-repositorio>
 cd ChatBot
 ```
 
-### 2. Instalar dependencias
+#### 2. Instalar dependencias
 ```bash
 npm install
 ```
 
-### 3. Configurar variables de entorno
+#### 3. Configurar variables de entorno
 ```bash
 cp env.example .env
 ```
@@ -55,13 +87,16 @@ FACEBOOK_VERIFY_TOKEN=tu_facebook_verify_token
 WEBHOOK_SECRET=tu_webhook_secret
 ```
 
-### 4. Ejecutar el servidor
+#### 4. Ejecutar el servidor
 ```bash
 # Desarrollo
 npm run dev
 
 # Producción
 npm start
+
+# Demo (sin APIs reales)
+npm run demo
 ```
 
 ## 🔧 Configuración de APIs

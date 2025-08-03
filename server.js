@@ -39,6 +39,10 @@ app.get('/webhook/facebook', facebookController.verifyWebhook);
 app.post('/webhook/facebook', facebookController.handleWebhook);
 
 // Rutas para la interfaz web
+app.get('/', (req, res) => {
+  res.redirect('/admin');
+});
+
 app.get('/admin', (req, res) => {
   res.sendFile(__dirname + '/public/admin.html');
 });

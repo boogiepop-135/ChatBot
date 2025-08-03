@@ -1,0 +1,53 @@
+# Docker Compose para ChatBot Multiplataforma
+
+services:
+  chatbot:
+    build: .
+    container_name: chatbot-multiplataforma
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # Variables de entorno para APIs (configurar según necesites)
+      - WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN:-demo_token}
+      - WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID:-demo_phone_id}
+      - WHATSAPP_VERIFY_TOKEN=${WHATSAPP_VERIFY_TOKEN:-MULLBLUE_VERIFY_TOKEN_123}
+      - INSTAGRAM_ACCESS_TOKEN=${INSTAGRAM_ACCESS_TOKEN:-demo_token}
+      - INSTAGRAM_PAGE_ID=${INSTAGRAM_PAGE_ID:-demo_page_id}
+      - INSTAGRAM_VERIFY_TOKEN=${INSTAGRAM_VERIFY_TOKEN:-demo_verify_token}
+      - FACEBOOK_ACCESS_TOKEN=${FACEBOOK_ACCESS_TOKEN:-demo_token}
+      - FACEBOOK_PAGE_ID=${FACEBOOK_PAGE_ID:-demo_page_id}
+      - FACEBOOK_VERIFY_TOKEN=${FACEBOOK_VERIFY_TOKEN:-demo_verify_token}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET:-demo_secret}
+    volumes:
+      # Montar archivo .env si existe
+      - ./.env:/app/.env:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/admin"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Servicio opcional para desarrollo con nodemon
+  chatbot-dev:
+    build: .
+    container_name: chatbot-multiplataforma-dev
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+    profiles:
+      - dev
+    restart: unless-stopped
+
+networks:
+  default:
+    name: chatbot-network 

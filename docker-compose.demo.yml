@@ -1,0 +1,23 @@
+# Docker Compose Demo para ChatBot Multiplataforma
+
+services:
+  chatbot-demo:
+    build: .
+    container_name: chatbot-multiplataforma-demo
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    command: npm run demo
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/admin"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: chatbot-demo-network 
