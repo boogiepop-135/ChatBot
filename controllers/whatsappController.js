@@ -46,7 +46,7 @@ class WhatsAppController {
               if (value.messages && value.messages.length > 0) {
                 const message = value.messages[0];
                 console.log('📱 Procesando mensaje:', message);
-                await this.processMessage(message);
+                await WhatsAppController.prototype.processMessage.call(this, message);
               }
             }
           }
