@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const http = require('http');
 const socketIo = require('socket.io');
+const config = require('./config/environment');
 require('dotenv').config();
 
 // Importar controladores
@@ -67,7 +68,7 @@ io.on('connection', (socket) => {
 // Hacer io disponible globalmente
 global.io = io;
 
-const PORT = process.env.PORT || 3000;
+const PORT = config.PORT;
 
 server.listen(PORT, () => {
   console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
@@ -75,6 +76,8 @@ server.listen(PORT, () => {
   console.log(`📸 Instagram webhook: http://localhost:${PORT}/webhook/instagram`);
   console.log(`📘 Facebook webhook: http://localhost:${PORT}/webhook/facebook`);
   console.log(`🖥️  Panel de administración: http://localhost:${PORT}/admin`);
+  console.log(`🔧 Modo: ${config.NODE_ENV}`);
+  console.log(`🔑 Tokens configurados: WhatsApp=${!!config.WHATSAPP_ACCESS_TOKEN}, Instagram=${!!config.INSTAGRAM_ACCESS_TOKEN}, Facebook=${!!config.FACEBOOK_ACCESS_TOKEN}`);
 });
 
 module.exports = { app, io }; 

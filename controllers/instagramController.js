@@ -13,12 +13,17 @@ class InstagramController {
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token'];
     const challenge = req.query['hub.challenge'];
+    
+    // Usar valor por defecto si no está definido
+    const verifyToken = process.env.INSTAGRAM_VERIFY_TOKEN || 'MULLBLUE_VERIFY_TOKEN_123';
 
-    if (mode === 'subscribe' && token === this.verifyToken) {
+    if (mode === 'subscribe' && token === verifyToken) {
       console.log('✅ Webhook de Instagram verificado');
       res.status(200).send(challenge);
     } else {
       console.log('❌ Verificación de webhook de Instagram fallida');
+      console.log('Token recibido:', token);
+      console.log('Token esperado:', verifyToken);
       res.sendStatus(403);
     }
   }

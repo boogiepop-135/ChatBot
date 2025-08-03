@@ -11,6 +11,11 @@ class ChatbotController {
   // Obtener todas las conversaciones
   getConversations(req, res) {
     try {
+      // Verificar que conversations existe
+      if (!this.conversations) {
+        this.conversations = new Map();
+      }
+      
       const conversations = Array.from(this.conversations.values());
       res.json({
         success: true,
