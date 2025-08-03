@@ -33,21 +33,30 @@ class WhatsAppController {
   async handleWebhook(req, res) {
     try {
       const body = req.body;
+      console.log('📨 Webhook recibido:', JSON.stringify(body, null, 2));
 
       if (body.object === 'whatsapp_business_account') {
-        const entry = body.entry[0];
-        const changes = entry.changes[0];
-        const value = changes.value;
+        if (body.entry && body.entry.length > 0) {
+          const entry = body.entry[0];
+          if (entry.changes && entry.changes.length > 0) {
+            const changes = entry.changes[0];
+            if (changes.value) {
+              const value = changes.value;
 
-        if (value.messages && value.messages.length > 0) {
-          const message = value.messages[0];
-          await this.processMessage(message);
+              if (value.messages && value.messages.length > 0) {
+                const message = value.messages[0];
+                console.log('📱 Procesando mensaje:', message);
+                await this.processMessage(message);
+              }
+            }
+          }
         }
       }
 
       res.status(200).send('OK');
     } catch (error) {
-      console.error('Error en webhook de WhatsApp:', error);
+      console.error('❌ Error en webhook de WhatsApp:', error);
+      console.error('📄 Body recibido:', JSON.stringify(req.body, null, 2));
       res.status(500).send('Error interno del servidor');
     }
   }
